@@ -3,7 +3,7 @@ import _superagent from 'superagent';
 
 const superagent = superagentPromise(_superagent, global.Promise);
 
-const API_ROOT = 'https://localhost:8000/api';
+const API_ROOT = 'https://34.83.111.210:30301/api';
 
 const encode = encodeURIComponent;
 const responseBody = res => res.body;
