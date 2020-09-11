@@ -1,138 +1,74 @@
-# ![RealWorld Example App](logo.png)
+# ![React + Redux Example App](project-logo.png)
 
-[![Continuous Integration](https://github.com/jetli/rust-yew-realworld-example-app/workflows/build/badge.svg)](https://github.com/jetli/rust-yew-realworld-example-app/actions)
 [![RealWorld Frontend](https://img.shields.io/badge/realworld-frontend-%23783578.svg)](http://realworld.io)
 
-> ### [Rust] + [Yew] + [WebAssembly] codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld] spec and API.
+> ### React + Redux codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld-example-apps) spec and API.
+
+<a href="https://stackblitz.com/edit/react-redux-realworld" target="_blank"><img width="187" src="https://github.com/gothinkster/realworld/blob/master/media/edit_on_blitz.png?raw=true" /></a>&nbsp;&nbsp;<a href="https://thinkster.io/tutorials/build-a-real-world-react-redux-application" target="_blank"><img width="384" src="https://raw.githubusercontent.com/gothinkster/realworld/master/media/learn-btn-hr.png" /></a>
+
+### [Demo](https://react-redux.realworld.io)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
+
+Originally created for this [GH issue](https://github.com/reactjs/redux/issues/1353). The codebase is now feature complete; please submit bug fixes via pull requests & feedback via issues.
+
+We also have notes in [**our wiki**](https://github.com/gothinkster/react-redux-realworld-example-app/wiki) about how the various patterns used in this codebase and how they work (thanks [@thejmazz](https://github.com/thejmazz)!)
 
 
-### [Demo]&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld]
+## Getting started
+
+You can view a live demo over at https://react-redux.realworld.io/
+
+To get the frontend running locally:
+
+- Clone this repo
+- `npm install` to install all req'd dependencies
+- `npm start` to start the local server (this project uses create-react-app)
+
+Local web server will use port 4100 instead of standard React's port 3000 to prevent conflicts with some backends like Node or Rails. You can configure port in scripts section of `package.json`: we use [cross-env](https://github.com/kentcdodds/cross-env) to set environment variable PORT for React scripts, this is Windows-compatible way of setting environment variables.
+ 
+Alternatively, you can add `.env` file in the root folder of project to set environment variables (use PORT to change webserver's port). This file will be ignored by git, so it is suitable for API keys and other sensitive stuff. Refer to [dotenv](https://github.com/motdotla/dotenv) and [React](https://github.com/facebookincubator/create-react-app/blob/master/packages/react-scripts/template/README.md#adding-development-environment-variables-in-env) documentation for more details. Also, please remove setting variable via script section of `package.json` - `dotenv` never override variables if they are already set.  
+
+### Making requests to the backend API
+
+For convenience, we have a live API server running at https://conduit.productionready.io/api for the application to make requests against. You can view [the API spec here](https://github.com/GoThinkster/productionready/blob/master/api) which contains all routes & responses for the server.
+
+The source code for the backend server (available for Node, Rails and Django) can be found in the [main RealWorld repo](https://github.com/gothinkster/realworld).
+
+If you want to change the API URL to a local server, simply edit `src/agent.js` and change `API_ROOT` to the local server's URL (i.e. `http://localhost:3000/api`)
 
 
-This codebase was created to demonstrate a fully fledged [WebAssembly] web application built with [Yew] including CRUD operations, authentication, routing, pagination, and more.
+## Functionality overview
 
-We've gone to great lengths to adhere to the [Yew] community styleguides & best practices.
+The example application is a social blogging site (i.e. a Medium.com clone) called "Conduit". It uses a custom API for all requests, including authentication. You can view a live demo over at https://redux.productionready.io/
 
-For more information on how to this works with other frontends/backends, head over to the [RealWorld] repo.
+**General functionality:**
 
-# How it looks
+- Authenticate users via JWT (login/signup pages + logout button on settings page)
+- CRU* users (sign up & settings page - no deleting required)
+- CRUD Articles
+- CR*D Comments on articles (no updating required)
+- GET and display paginated lists of articles
+- Favorite articles
+- Follow other users
 
-You can view a live demo over at [Demo]
+**The general page breakdown looks like this:**
 
-| Home(Web) | Article(Web) |
-| :---:         |     :---:      |
-| ![Home](screenshots/home.png) | ![Article](screenshots/article.png) |
+- Home page (URL: /#/ )
+    - List of tags
+    - List of articles pulled from either Feed, Global, or by Tag
+    - Pagination for list of articles
+- Sign in/Sign up pages (URL: /#/login, /#/register )
+    - Use JWT (store the token in localStorage)
+- Settings page (URL: /#/settings )
+- Editor page to create/edit articles (URL: /#/editor, /#/editor/article-slug-here )
+- Article page (URL: /#/article/article-slug-here )
+    - Delete article button (only shown to article's author)
+    - Render markdown from server client side
+    - Comments section at bottom of page
+    - Delete comment button (only shown to comment's author)
+- Profile page (URL: /#/@username, /#/@username/favorites )
+    - Show basic user info
+    - List of articles populated from author's created articles or author's favorited articles
 
-| Edit(Desktop) | Sign Up(Desktop) |
-| :---:         |     :---:      |
-| ![Edit](screenshots/edit.png) | ![Sign Up](screenshots/sign_up.png) |
+<br />
 
-# How it works
-
-This is an application written in [Rust] that utilizes [Yew] and [WebAssembly] for developing the frontend web app that powers the RealWorld application.
-
-You can view a full list of crates being used in [Cargo.toml], but here are some of the main ones of note:
-
-* [yew] - a modern Rust framework for creating multi-threaded frontend apps with WebAssembly.
-* [yew-router] - a routing library for the [Yew] framework.
-* [lazy_static] - a macro for declaring lazily evaluated statics in Rust.
-* [parking_lot] - provides implementations of `Mutex`, `RwLock`, `Condvar` and `Once` etc.
-* [pulldown-cmark] - a pull parser for CommonMark, used to parse Markdown.
-* [serde] - a generic serialization/deserialization framework.
-* [chrono] - date and time library for Rust.
-
-# Getting started
-
-## With Docker
-
-```
-docker-compose up
-```
-You can visit `http://localhost:8000` in your browser now.
-
-## Manually
-
-* Install [Rust]
-* Install [wasm-pack]
-  ```
-  cargo install wasm-pack
-  ```
-* Install [node]
-* Install npm packages
-  ```
-  npm run install
-  ```
-* Build and develop
-
-  Copy `.env.example` to `.env`, and you can change the environment variables if you like.
-  ```
-  cp .env.example .env
-  npm start
-  ```
-  You can visit `http://localhost:8000` in your browser now.
-* Build and release
-  ```
-  npm run build
-  ```
-  You should find static files at `crates/conduit-wasm/dist` folder now, they are hosted in [gh-pages] branch as a demo.
-
-* Build and develop for desktop
-
-  If you're planning on targeting Linux you must ensure that Webkit2gtk is already installed and available for discovery via the pkg-config command.
-  ```
-  sudo apt-get update
-  sudo apt-get install libwebkit2gtk-4.0-37 libwebkit2gtk-4.0-dev
-  ```
-
-  ```
-  npm run build:webview
-  cargo run -p conduit-webview
-  ```
-
-* Test
-
-  Install [chromedriver], run tests in headless browsers.
-  ```
-  npm test
-  ```
-
-# Create Yew App
-
-This project was bootstrapped with [Create Yew App], if you want to quickly setup a new Yew web app for your own, you might try [Create Yew App], an unofficial tool to set up a modern Yew web app by simply running one command. 
-
-```bash
-npx create-yew-app my-app
-cd my-app
-npm start
-```
-
-# Contributing
-
-Feel free to take a look at the current issues in this repo for anything that currently needs to be worked on.
-
-You are also welcome to open a PR or a new issue if you see something is missing or could be improved upon.
-
-# License
-
-Apache License (Version 2.0)
-
-See [LICENSE] for details
-
-[chromedriver]: http://chromedriver.chromium.org/downloads
-[chrono]: https://github.com/chronotope/chrono
-[Cargo.toml]: ./crates/conduit-wasm/Cargo.toml
-[Create Yew App]: https://github.com/jetli/create-yew-app
-[Demo]: https://jetli.github.io/rust-yew-realworld-example-app/
-[gh-pages]: https://github.com/jetli/rust-yew-realworld-example-app/tree/gh-pages
-[lazy_static]: https://github.com/rust-lang-nursery/lazy-static.rs
-[LICENSE]: ./LICENSE
-[node]: https://nodejs.org
-[parking_lot]: https://github.com/Amanieu/parking_lot
-[pulldown-cmark]: https://github.com/raphlinus/pulldown-cmark
-[RealWorld]: https://github.com/gothinkster/realworld
-[Rust]: https://www.rust-lang.org/
-[serde]: https://github.com/serde-rs/serde
-[WebAssembly]: https://webassembly.org
-[wasm-pack]: https://github.com/rustwasm/wasm-pack
-[Yew]: https://github.com/yewstack/yew
-[yew-router]: https://github.com/yewstack/yew_router
+[![Brought to you by Thinkster](https://raw.githubusercontent.com/gothinkster/realworld/master/media/end.png)](https://thinkster.io)

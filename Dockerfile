@@ -1,20 +1,17 @@
-FROM rust:latest
+FROM node:14-alpine
 
-# Install nodejs
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
-RUN apt-get update && apt-get install nodejs
+RUN mkdir /react
 
-# Install wasm-pack
-RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+WORKDIR /react
 
-WORKDIR /usr/src/conduit-wasm
+COPY package.json /react/package.json
 
-COPY ./crates/conduit-wasm .
-
-COPY .env.example .env
+RUN npm install -g serve
 
 RUN npm install
 
-EXPOSE 8000
+COPY . /react
+
+EXPOSE  3000
 
 CMD [ "npm", "start" ]
